@@ -1,17 +1,20 @@
 import React from 'react'
-import { Dashboard, Login, PrivateRoute, AuthWrapper, Error } from './pages'
+import { Dashboard, Login, AuthWrapper, Error } from './pages'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
 const router = createBrowserRouter([
 	{
 		path: '/',
-		element: <Dashboard />,
+		element: (
+			<AuthWrapper>
+				<Dashboard />
+			</AuthWrapper>
+		),
 		errorElement: <Error />
 	},
 	{
 		path: '/login',
-		element: <Login />,
-		errorElement: <h1>HAHAHAHA</h1>
+		element: <Login />
 	}
 ])
 
