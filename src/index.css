@@ -59,23 +59,6 @@ Global Styles
 ===============
 */
 
-/* * {
-	scrollbar-color: red blue;
-} */
-/* 
-::-webkit-scrollbar {
-	width: 1rem;
-}
-::-webkit-scrollbar-track {
-	border-radius: 100vw;
-	background: hsl(120 75% 50% /1);
-	margin-block: 0.3rem;
-}
-::-webkit-scrollbar-thumb {
-	border-radius: 100vw;
-	background: hsl(120 100% 20% /1);
-} */
-
 *,
 ::after,
 ::before {

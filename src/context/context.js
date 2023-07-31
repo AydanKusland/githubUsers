@@ -13,6 +13,12 @@ export const GithubProvider = ({ children }) => {
 	const [repos, setRepos] = useState(mockRepos)
 	const [followers, setFollowers] = useState(mockFollowers)
 
+	const initialize = () => {
+		setGithubUser(mockUser)
+		setRepos(mockRepos)
+		setFollowers(mockFollowers)
+	}
+
 	// request loading
 	const [requests, setRequests] = useState(0)
 	const [isLoading, setIsLoading] = useState(false)
@@ -24,20 +30,27 @@ export const GithubProvider = ({ children }) => {
 		setIsLoading(true)
 		try {
 			const response = await axios(`${rootUrl}/users/${user}`)
-			if (response) {
-				setGithubUser(response.data)
-				const { login, followers_url } = response.data
-				// REPOS
-				const { data: repos } = await axios(
-					`${rootUrl}/users/${login}/repos?per_page=100`
-				)
-				setRepos(repos)
-				// FOLLOWERS
-				const { data: followers } = await axios(`${followers_url}?per_page=100`)
-				setFollowers(followers)
-			}
+			const { login, followers_url } = response.data
+
+			await Promise.allSettled([
+				axios(`${rootUrl}/users/${login}/repos?per_page=100`),
+				axios(`${followers_url}?per_page=100`)
+			])
+				.then(results => {
+					const [repos, followers] = results
+					if (repos.status === 'fulfilled') {
+						setRepos(repos.value.data)
+					}
+					if (followers.status === 'fulfilled') {
+						setFollowers(followers.value.data)
+					}
+				})
+				.catch(err => console.log(err))
+
+			setGithubUser(response.data)
 		} catch (error) {
 			toggleError(true, 'there is no user with such name')
+			initialize()
 			console.log(error)
 		}
 		checkRequests()
@@ -51,7 +64,6 @@ export const GithubProvider = ({ children }) => {
 			let {
 				rate: { remaining }
 			} = data
-			// remaining = 0
 			setRequests(remaining ?? 'could not get a data')
 			if (remaining === 0) {
 				toggleError(true, 'sorry, you have exceeded your hourly limit')
@@ -59,6 +71,7 @@ export const GithubProvider = ({ children }) => {
 		} catch (error) {
 			console.log(error)
 		}
+		console.log()
 	}
 	// error
 
